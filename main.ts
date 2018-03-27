@@ -1,32 +1,32 @@
-import {Observable} from "rxjs";
+import { Observable } from "rxjs";
+import { load, loadWithFetch } from "./loader";
 
-let numbers = [1, 5, 10];
-let source = Observable.create(observer => {
+let output = document.getElementById("output");
+let button = document.getElementById("button");
 
-    let index = 0;
-    let produceValue = () => {
-        observer.next(numbers[index++]);
+let click = Observable.fromEvent(button, "click")
 
-        if(index < numbers.length) {
-            setTimeout(produceValue, 250);
-        }
-        else {
-            observer.complete();
-        }
-    }
+function renderMovies(movies) {
+    movies.forEach(m => {
+        let div = document.createElement("div");
+        div.innerText = m.title;
+        output.appendChild(div);
+    });
+}
 
-    produceValue();
+// let subscription = load("movies.json")
+//                     .subscribe(
+//                     renderMovies,
+//                     e => console.log(`error: ${e}`),
+//                     () => console.log("complete")
+//                     );
+//                     console.log(subscription);
+//  subscription.unsubscribe();                   
 
-}).map(n => n * 2)
-  .filter(n => n > 4);
-  
-
-source.subscribe(
-    value => console.log(`value: ${value}`),
+//click.flatMap(e => loadWithFetch("movies.json"))
+click.flatMap(e => load("movies.json"))
+    .subscribe(
+    renderMovies,
     e => console.log(`error: ${e}`),
-    () => console.log("complete")   
+    () => console.log("complete")
 );
-
-
-
-
